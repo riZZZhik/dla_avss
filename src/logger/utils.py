@@ -65,3 +65,28 @@ def plot_spectrogram(spectrogram, name=None):
     plt.close()
 
     return image
+
+
+def plot_waveform(waveform, name=None):
+    """
+    Plot waveform
+
+    Args:
+        waveform (Tensor): waveform tensor.
+        name (None | str): optional name.
+    Returns:
+        image (Image): image of the waveform
+    """
+    plt.figure(figsize=(20, 5))
+    plt.plot(waveform)
+    plt.title(name)
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
+    # convert buffer to Tensor
+    image = ToTensor()(PIL.Image.open(buf))
+
+    plt.close()
+
+    return image
