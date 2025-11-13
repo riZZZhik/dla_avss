@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.logger.utils import plot_spectrogram
+from src.logger.utils import plot_spectrogram, plot_waveform
 from src.metrics.tracker import MetricTracker
-from src.metrics.utils import calc_cer, calc_wer
+from src.metrics.utils import calc_pesq, calc_sdr, calc_si_snr, calc_stoi
 from src.trainer.base_trainer import BaseTrainer
 
 
@@ -78,10 +78,10 @@ class Trainer(BaseTrainer):
 
         # logging scheme might be different for different partitions
         if mode == "train":  # the method is called only every self.log_step steps
-            self.log_spectrogram(**batch)
+            self.log_waveform(**batch)
         else:
             # Log Stuff
-            self.log_spectrogram(**batch)
+            self.log_waveform(**batch)
             self.log_predictions(**batch)
 
     def log_spectrogram(self, spectrogram, **batch):
@@ -89,35 +89,36 @@ class Trainer(BaseTrainer):
         image = plot_spectrogram(spectrogram_for_plot)
         self.writer.add_image("spectrogram", image)
 
+    def log_waveform(self, waveforms, **batch):
+        waveform_for_plot = waveforms[0].detach().cpu()
+        image = plot_waveform(waveform_for_plot)
+        self.writer.add_image("waveform", image)
+
     def log_predictions(
-        self, text, log_probs, log_probs_length, audio_path, examples_to_log=10, **batch
+        self, preds, speaker1, speaker2, audio_path, examples_to_log=4, **batch
     ):
-        # TODO add beam search
-        # Note: by improving text encoder and metrics design
-        # this logging can also be improved significantly
+        tuples = list(zip(preds, speaker1, speaker2, audio_path))
 
-        argmax_inds = log_probs.cpu().argmax(-1).numpy()
-        argmax_inds = [
-            inds[: int(ind_len)]
-            for inds, ind_len in zip(argmax_inds, log_probs_length.numpy())
-        ]
-        argmax_texts_raw = [self.text_encoder.decode(inds) for inds in argmax_inds]
-        argmax_texts = [self.text_encoder.ctc_decode(inds) for inds in argmax_inds]
-        tuples = list(zip(argmax_texts, text, argmax_texts_raw, audio_path))
+        for preds, speaker1, speaker2, audio_path in tuples[:examples_to_log]:
+            predicted_s1 = preds[..., 0, :]
+            predicted_s2 = preds[..., 1, :]
 
-        rows = {}
-        for pred, target, raw_pred, audio_path in tuples[:examples_to_log]:
-            target = self.text_encoder.normalize_text(target)
-            wer = calc_wer(target, pred) * 100
-            cer = calc_cer(target, pred) * 100
+            metadata_s1 = {"si_snri": calc_si_snr(predicted_s1, speaker1)}
+            metadata_s2 = {"si_snri": calc_si_snr(predicted_s2, speaker2)}
 
-            rows[Path(audio_path).name] = {
-                "target": target,
-                "raw prediction": raw_pred,
-                "predictions": pred,
-                "wer": wer,
-                "cer": cer,
-            }
-        self.writer.add_table(
-            "predictions", pd.DataFrame.from_dict(rows, orient="index")
-        )
+            self.writer.add_audio(
+                audio_name=audio_path + "_original_s1", audio=speaker1
+            )
+            self.writer.add_audio(
+                audio_name=audio_path + "_original_s2", audio=speaker1
+            )
+            self.writer.add_audio(
+                audio_name=audio_path + "_predicted_s1",
+                audio=predicted_s1,
+                metadata=metadata_s1,
+            )
+            self.writer.add_audio(
+                audio_name=audio_path + "_predicted_s2",
+                audio=predicted_s2,
+                metadata=metadata_s2,
+            )
