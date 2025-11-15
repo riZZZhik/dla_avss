@@ -1,7 +1,14 @@
-import torch
-from torch.testing import assert_close
+import sys
+from pathlib import Path
 
-from ..metrics.utils import calc_pesq, calc_sdr, calc_si_snr, calc_stoi
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+import torch  # noqa: E402
+from torch.testing import assert_close  # noqa: E402
+
+from src.metrics.utils import calc_pesq, calc_sdr, calc_si_snr, calc_stoi  # noqa: E402
 
 
 def test_si_snr():
@@ -43,6 +50,7 @@ def test():
     test_sdr()
     test_pesq()
     test_stoi()
+    print("Success")
 
 
 if __name__ == "__main__":
