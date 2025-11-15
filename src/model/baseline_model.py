@@ -7,51 +7,35 @@ class BaselineModel(nn.Module):
     Simple MLP
     """
 
-    def __init__(self, n_feats, n_tokens, fc_hidden=512):
+    def __init__(self, length, fc_hidden=512):
         """
         Args:
-            n_feats (int): number of input features.
-            n_tokens (int): number of tokens in the vocabulary.
+            length (int): input's length.
             fc_hidden (int): number of hidden features.
         """
         super().__init__()
 
         self.net = Sequential(
             # people say it can approximate any function...
-            nn.Linear(in_features=n_feats, out_features=fc_hidden),
+            nn.Linear(in_features=length, out_features=fc_hidden),
             nn.ReLU(),
             nn.Linear(in_features=fc_hidden, out_features=fc_hidden),
             nn.ReLU(),
-            nn.Linear(in_features=fc_hidden, out_features=n_tokens),
+            nn.Linear(in_features=fc_hidden, out_features=2 * length),
         )
 
-    def forward(self, spectrogram, spectrogram_length, **batch):
+    def forward(self, mix, **batch):
         """
         Model forward method.
 
         Args:
-            spectrogram (Tensor): input spectrogram.
-            spectrogram_length (Tensor): spectrogram original lengths.
+            mix (Tensor): mixed input.
         Returns:
-            output (dict): output dict containing log_probs and
-                transformed lengths.
+            output (dict): output dict containing predictions.
         """
-        output = self.net(spectrogram.transpose(1, 2))
-        log_probs = nn.functional.log_softmax(output, dim=-1)
-        log_probs_length = self.transform_input_lengths(spectrogram_length)
-        return {"log_probs": log_probs, "log_probs_length": log_probs_length}
-
-    def transform_input_lengths(self, input_lengths):
-        """
-        As the network may compress the Time dimension, we need to know
-        what are the new temporal lengths after compression.
-
-        Args:
-            input_lengths (Tensor): old input lengths
-        Returns:
-            output_lengths (Tensor): new temporal lengths
-        """
-        return input_lengths  # we don't reduce time dimension here
+        output = self.net(mix)
+        output = output.view((mix.shape[0], 2, mix.shape[1]))
+        return {"preds": output}
 
     def __str__(self):
         """
