@@ -72,7 +72,7 @@ class BaseDataset(Dataset):
         # TODO добавить чтение видео фалйа для модели avss
         data_dict = self._index[ind]
         mix_audio_path = data_dict["audio_path"]
-        mix = self.load_audio(mix_audio_path)
+        mix = self.load_audio(mix_audio_path).squeeze()
 
         instance_data = {
             "mix": mix,
@@ -85,11 +85,10 @@ class BaseDataset(Dataset):
         ):
             speaker1_audio_path = data_dict["speaker1_audio_path"]
             speaker2_audio_path = data_dict["speaker2_audio_path"]
-            speaker1_rec = self.load_audio(speaker1_audio_path)
-            speaker2_rec = self.load_audio(speaker2_audio_path)
+            speaker1_rec = self.load_audio(speaker1_audio_path).squeeze()
+            speaker2_rec = self.load_audio(speaker2_audio_path).squeeze()
 
-            instance_data["speaker1"] = speaker1_rec
-            instance_data["speaker2"] = speaker2_rec
+            instance_data["speakers"] = torch.stack([speaker1_rec, speaker2_rec], dim=0)
 
         instance_data = self.preprocess_data(instance_data)
 

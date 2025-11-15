@@ -14,4 +14,27 @@ def collate_fn(dataset_items: list[dict]):
             of the tensors.
     """
 
-    pass  # TODO
+    mixs = [item["mix"] for item in dataset_items]  # L -> BxL
+    audio_paths = [item["audio_path"] for item in dataset_items]
+    speakerss = [item["speakers"] for item in dataset_items]  # SxL -> BxSxL
+
+    assert torch.tensor(
+        [len(mix) == len(mixs[0]) for mix in mixs]
+    ).all(), "Mix records must have the same length"
+    assert torch.tensor(
+        [len(speakerss) == 2 for speakers in speakerss]
+    ).all(), "Not all records sonsists of 2 speakers"
+    assert torch.tensor(
+        [len(speaker1_rec) == len(speakerss[0][0]) for speaker1_rec in speakerss[0]]
+    ).all(), "Speaker's records must have the same length"
+    assert torch.tensor(
+        [len(speaker2_rec) == len(speakerss[0][0]) for speaker2_rec in speakerss[1]]
+    ).all(), "Speaker's records must have the same length"
+
+    res = {
+        "mix": torch.stack(mixs, dim=0),
+        "audio_path": audio_paths,
+        "speakers": torch.stack(speakerss, dim=0),
+    }
+
+    return res
