@@ -6,5 +6,9 @@ inference: # metrics that are calculated during inference (eval)
     name: "SDRi"
   - _target_: src.metrics.PESQMetric
     name: "PESQ"
+    fs: 16000
+    keep_same_device: True
   - _target_: src.metrics.STOIMetric
     name: "STOI"
+    fs: 16000
+    keep_same_device: True

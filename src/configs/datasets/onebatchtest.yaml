@@ -1,5 +1,7 @@
 train:
   _target_: src.datasets.AVSSDataset
+  data_dir: "/Users/aleksandr/Downloads/avss_test"
+  index_dir: "/Users/aleksandr/Downloads/avss_test"
   split: "val"
   max_audio_length: 20.0
   limit: 2
@@ -8,6 +10,8 @@ train:
 # do not filter test dataset, you want to evaluate on the whole dataset
 val:
   _target_: src.datasets.AVSSDataset
+  data_dir: "/Users/aleksandr/Downloads/avss_test"
+  index_dir: "/Users/aleksandr/Downloads/avss_test"
   split: "val"
   max_audio_length: 20.0
   limit: 2

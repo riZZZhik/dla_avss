@@ -11,5 +11,33 @@ class SI_SNRiMetric(BaseMetric):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def __call__(self, preds: Tensor, target: Tensor, original_mix: Tensor, **kwargs):
-        return calc_si_snr(preds, target) - calc_si_snr(original_mix, target)
+    def __call__(self, preds: Tensor, speakers: Tensor, mix: Tensor, **kwargs):
+        # Not pit, because snrI
+
+        preds_s1 = preds[..., 0, :]
+        preds_s2 = preds[..., 1, :]
+        speaker1 = speakers[..., 0, :]
+        speaker2 = speakers[..., 1, :]
+
+        val_per1 = (
+            (
+                calc_si_snr(preds_s1, speaker1)
+                - calc_si_snr(mix, speaker1)
+                + calc_si_snr(preds_s2, speaker2)
+                - calc_si_snr(mix, speaker2)
+            ).sum()
+            / 2
+            / preds.shape[0]
+        )
+        val_per2 = (
+            (
+                calc_si_snr(preds_s1, speaker2)
+                - calc_si_snr(mix, speaker2)
+                + calc_si_snr(preds_s2, speaker1)
+                - calc_si_snr(mix, speaker1)
+            ).sum()
+            / 2
+            / preds.shape[0]
+        )
+
+        return max(val_per1, val_per2)

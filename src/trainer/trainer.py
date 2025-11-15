@@ -89,19 +89,22 @@ class Trainer(BaseTrainer):
         image = plot_spectrogram(spectrogram_for_plot)
         self.writer.add_image("spectrogram", image)
 
-    def log_waveform(self, waveforms, **batch):
-        waveform_for_plot = waveforms[0].detach().cpu()
-        image = plot_waveform(waveform_for_plot)
-        self.writer.add_image("waveform", image)
+    def log_waveform(self, preds, **batch):
+        waveform_s1_for_plot = preds[0][0].detach().cpu()
+        waveform_s2_for_plot = preds[0][1].detach().cpu()
+        image_s1 = plot_waveform(waveform_s1_for_plot)
+        image_s2 = plot_waveform(waveform_s2_for_plot)
+        self.writer.add_image("waveform", image_s1)
+        self.writer.add_image("waveform", image_s2)
 
-    def log_predictions(
-        self, preds, speaker1, speaker2, audio_path, examples_to_log=4, **batch
-    ):
-        tuples = list(zip(preds, speaker1, speaker2, audio_path))
+    def log_predictions(self, preds, speakers, audio_path, examples_to_log=4, **batch):
+        tuples = list(zip(preds, speakers, audio_path))
 
-        for preds, speaker1, speaker2, audio_path in tuples[:examples_to_log]:
+        for preds, speakers, audio_path in tuples[:examples_to_log]:
             predicted_s1 = preds[..., 0, :]
+            speaker1 = speakers[..., 0, :]
             predicted_s2 = preds[..., 1, :]
+            speaker2 = speakers[..., 1, :]
 
             metadata_s1 = {"si_snri": calc_si_snr(predicted_s1, speaker1)}
             metadata_s2 = {"si_snri": calc_si_snr(predicted_s2, speaker2)}
