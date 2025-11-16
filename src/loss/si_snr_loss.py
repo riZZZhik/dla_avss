@@ -18,7 +18,7 @@ class SI_SNR_loss(nn.Module):
         )
 
     def forward(self, preds, speakers, **batch) -> Tensor:
-        # BxSxL
+        # BxSpeakersxL
         if self.upit is None:
             preds_s1 = preds[..., 0, :]
             preds_s2 = preds[..., 1, :]

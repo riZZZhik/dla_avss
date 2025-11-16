@@ -1,0 +1,8 @@
+_target_: src.model.DPRNNModel
+encoder_out_features: 512
+kernel: 2
+bottleneck_size: 128
+dprnn_hidden_features: 128
+dprnn_dropout: 0
+num_dprnn_blocks: 4
+chunk_len: 200 # 32
