@@ -22,13 +22,19 @@ def collate_fn(dataset_items: list[dict]):
         [len(mix) == len(mixs[0]) for mix in mixs]
     ).all(), "Mix records must have the same length"
     assert torch.tensor(
-        [len(speakerss) == 2 for speakers in speakerss]
+        [len(speakers) == 2 for speakers in speakerss]
     ).all(), "Not all records sonsists of 2 speakers"
     assert torch.tensor(
-        [len(speaker1_rec) == len(speakerss[0][0]) for speaker1_rec in speakerss[0]]
+        [
+            len(speaker1_rec) == len(speakerss[0][0])
+            for speaker1_rec in [speakerss_row[0] for speakerss_row in speakerss]
+        ]
     ).all(), "Speaker's records must have the same length"
     assert torch.tensor(
-        [len(speaker2_rec) == len(speakerss[0][0]) for speaker2_rec in speakerss[1]]
+        [
+            len(speaker2_rec) == len(speakerss[0][0])
+            for speaker2_rec in [speakerss_row[1] for speakerss_row in speakerss]
+        ]
     ).all(), "Speaker's records must have the same length"
 
     res = {

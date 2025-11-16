@@ -1,12 +1,18 @@
 train:
   _target_: src.datasets.AVSSDataset
+  data_dir: "/kaggle/input/dla-avss-dataset/dla_dataset"
+  index_dir: "/kaggle/working/"
   split: "train"
   instance_transforms: ${transforms.instance_transforms.train}
 val:
   _target_: src.datasets.AVSSDataset
+  data_dir: "/kaggle/input/dla-avss-dataset/dla_dataset"
+  index_dir: "/kaggle/working/"
   split: "val"
   instance_transforms: ${transforms.instance_transforms.inference}
-test:
-  _target_: src.datasets.AVSSDataset
-  split: "test"
-  instance_transforms: ${transforms.instance_transforms.inference}
+# test:
+#   _target_: src.datasets.AVSSDataset
+#   data_dir: "/kaggle/input/dla-avss-dataset/dla_dataset"
+#   index_dir: "/kaggle/working/"
+#   split: "test"
+#   instance_transforms: ${transforms.instance_transforms.inference}
