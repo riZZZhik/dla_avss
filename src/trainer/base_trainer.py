@@ -28,6 +28,7 @@ class BaseTrainer:
         logger,
         writer,
         epoch_len=None,
+        eval_len=None,
         skip_oom=True,
         batch_transforms=None,
     ):
@@ -85,6 +86,13 @@ class BaseTrainer:
         self.evaluation_dataloaders = {
             k: v for k, v in dataloaders.items() if k != "train"
         }
+
+        if eval_len is None:
+            self.eval_len = max(
+                [len(v) for k, v in dataloaders.items() if k != "train"]
+            )
+        else:
+            self.eval_len = eval_len
 
         # define epochs
         self._last_epoch = 0  # required for saving on interruption
@@ -263,16 +271,19 @@ class BaseTrainer:
         self.is_train = False
         self.model.eval()
         self.evaluation_metrics.reset()
+        cur_eval_len = min(self.eval_len, len(dataloader))
         with torch.no_grad():
             for batch_idx, batch in tqdm(
                 enumerate(dataloader),
                 desc=part,
-                total=len(dataloader),
+                total=cur_eval_len,
             ):
                 batch = self.process_batch(
                     batch,
                     metrics=self.evaluation_metrics,
                 )
+                if batch_idx + 1 >= cur_eval_len:
+                    break
             self.writer.set_step(epoch * self.epoch_len, part)
             self._log_scalars(self.evaluation_metrics)
             self._log_batch(

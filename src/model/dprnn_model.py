@@ -350,10 +350,16 @@ class DPRNNModel(nn.Module):
 
         if K - (P + L % K) % K > 0:
             x = torch.cat(
-                [x, torch.zeros((B, EOutF, K - (P + L % K) % K), dtype=x.dtype)], dim=2
+                [
+                    x,
+                    torch.zeros(
+                        (B, EOutF, K - (P + L % K) % K), dtype=x.dtype, device=x.device
+                    ),
+                ],
+                dim=2,
             )
 
-        P_pad = torch.zeros((B, EOutF, P), dtype=x.dtype)
+        P_pad = torch.zeros((B, EOutF, P), dtype=x.dtype, device=x.device)
         x = torch.cat([P_pad, x, P_pad], dim=2)
 
         return x
