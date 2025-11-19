@@ -2,21 +2,9 @@ import torch
 
 
 def collate_fn(dataset_items: list[dict]):
-    """
-    Collate and pad fields in the dataset items.
-    Converts individual items into a batch.
-
-    Args:
-        dataset_items (list[dict]): list of objects from
-            dataset.__getitem__.
-    Returns:
-        result_batch (dict[Tensor]): dict, containing batch-version
-            of the tensors.
-    """
-
-    mixs = [item["mix"] for item in dataset_items]  # L -> BxL
+    mixs = [item["mix"] for item in dataset_items]
     audio_paths = [item["audio_path"] for item in dataset_items]
-    speakerss = [item["speakers"] for item in dataset_items]  # SxL -> BxSxL
+    speakerss = [item["speakers"] for item in dataset_items]
 
     assert torch.tensor(
         [len(mix) == len(mixs[0]) for mix in mixs]
@@ -27,20 +15,26 @@ def collate_fn(dataset_items: list[dict]):
     assert torch.tensor(
         [
             len(speaker1_rec) == len(speakerss[0][0])
-            for speaker1_rec in [speakerss_row[0] for speakerss_row in speakerss]
+            for speaker1_rec in (s[0] for s in speakerss)
         ]
-    ).all(), "Speaker's records must have the same length"
+    ).all(), "Speaker1 records must have the same length"
     assert torch.tensor(
         [
-            len(speaker2_rec) == len(speakerss[0][0])
-            for speaker2_rec in [speakerss_row[1] for speakerss_row in speakerss]
+            len(speaker2_rec) == len(speakerss[0][1])
+            for speaker2_rec in (s[1] for s in speakerss)
         ]
-    ).all(), "Speaker's records must have the same length"
+    ).all(), "Speaker2 records must have the same length"
 
     res = {
-        "mix": torch.stack(mixs, dim=0),
+        "mix": torch.stack(mixs, dim=0),             
         "audio_path": audio_paths,
-        "speakers": torch.stack(speakerss, dim=0),
+        "speakers": torch.stack(speakerss, dim=0),   
     }
+    
+    if "vis_s1" in dataset_items[0]:
+        vis1_list = [item["vis_s1"] for item in dataset_items] 
+        vis2_list = [item["vis_s2"] for item in dataset_items]  
+        res["vis_s1"] = torch.stack(vis1_list, dim=0)         
+        res["vis_s2"] = torch.stack(vis2_list, dim=0)          
 
     return res
