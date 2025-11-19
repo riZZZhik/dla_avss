@@ -1,0 +1,18 @@
+_target_: src.model.av_rtfsnet_model.AVRTFSNetModel
+
+n_src: 2
+
+n_fft: 512
+hop_length: 128
+win_length: 512
+
+base_channels: 64
+num_blocks: 2
+
+core_mode: "lstm" 
+num_layers_freq: 1
+num_layers_time: 1
+num_heads: 4  
+dropout: 0.0
+
+visual_dim: 96

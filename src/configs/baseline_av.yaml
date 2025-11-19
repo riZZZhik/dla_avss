@@ -1,0 +1,38 @@
+defaults:
+  - model: avrtfsnet
+  - writer: cometml
+  - metrics: example
+  - datasets: avss
+  - dataloader: example
+  - transforms: example_only_instance
+  - _self_
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 3e-4
+
+lr_scheduler:
+  _target_: torch.optim.lr_scheduler.OneCycleLR
+  max_lr: 1e-2
+  pct_start: 0.1
+  steps_per_epoch: ${trainer.epoch_len}
+  epochs: ${trainer.n_epochs}
+  anneal_strategy: cos
+
+loss_function:
+  _target_: src.loss.SI_SNR_loss  
+
+trainer:
+  log_step: 50
+  n_epochs: 50
+  epoch_len: 200
+  eval_len: 100
+  device_tensors: ["mix", "speakers", "vis_s1", "vis_s2"]
+  resume_from: null
+  device: auto
+  override: True
+  monitor: "max val_SI_SNRi"
+  save_period: 5
+  early_stop: ${trainer.n_epochs}
+  save_dir: "saved"
+  seed: 1
