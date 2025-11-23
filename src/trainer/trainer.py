@@ -110,18 +110,18 @@ class Trainer(BaseTrainer):
             metadata_s2 = {"si_snri": calc_si_snr(predicted_s2, speaker2)}
 
             self.writer.add_audio(
-                audio_name=audio_path + "_original_s1", audio=speaker1
+                audio_name=audio_path.replace(".", "_original_s1."), audio=speaker1
             )
             self.writer.add_audio(
-                audio_name=audio_path + "_original_s2", audio=speaker1
+                audio_name=audio_path.replace(".", "_original_s2."), audio=speaker2
             )
             self.writer.add_audio(
-                audio_name=audio_path + "_predicted_s1",
+                audio_name=audio_path.replace(".", "_predicted_s1."),
                 audio=predicted_s1,
                 metadata=metadata_s1,
             )
             self.writer.add_audio(
-                audio_name=audio_path + "_predicted_s2",
+                audio_name=audio_path.replace(".", "_predicted_s2."),
                 audio=predicted_s2,
                 metadata=metadata_s2,
             )
