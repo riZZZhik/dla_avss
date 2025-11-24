@@ -1,0 +1,13 @@
+defaults:
+  - train_rtfsnet
+  - override datasets: onebatchtest
+  - _self_
+
+writer:
+  run_name: train_rtfsnet_onebatch
+
+dataloader:
+  batch_size: 2
+
+trainer:
+  n_epochs: 5
