@@ -97,31 +97,73 @@ class Trainer(BaseTrainer):
         self.writer.add_image("waveform", image_s1)
         self.writer.add_image("waveform", image_s2)
 
-    def log_predictions(self, preds, speakers, audio_path, examples_to_log=4, **batch):
-        tuples = list(zip(preds, speakers, audio_path))
+    def log_predictions(
+        self, preds, speakers, audio_path, mix, examples_to_log=4, **batch
+    ):
+        tuples = list(zip(preds, speakers, audio_path, mix))
 
-        for preds, speakers, audio_path in tuples[:examples_to_log]:
-            predicted_s1 = preds[..., 0, :]
+        for preds, speakers, audio_path, mix in tuples[:examples_to_log]:
+            true_predicted_s1 = preds[..., 0, :]
             speaker1 = speakers[..., 0, :]
-            predicted_s2 = preds[..., 1, :]
+            true_predicted_s2 = preds[..., 1, :]
             speaker2 = speakers[..., 1, :]
 
-            metadata_s1 = {"si_snri": calc_si_snr(predicted_s1, speaker1)}
-            metadata_s2 = {"si_snri": calc_si_snr(predicted_s2, speaker2)}
+            metadata_mix = {
+                "si_snr (mix, s1)": calc_si_snr(mix, speaker1),
+                "si_snr (mix, s2)": calc_si_snr(mix, speaker2),
+            }
+
+            per1 = (
+                calc_si_snr(true_predicted_s1, speaker1)
+                - calc_si_snr(mix, speaker1)
+                + calc_si_snr(true_predicted_s2, speaker2)
+                - calc_si_snr(mix, speaker2)
+            ).mean()
+            per2 = (
+                calc_si_snr(true_predicted_s1, speaker2)
+                - calc_si_snr(mix, speaker2)
+                + calc_si_snr(true_predicted_s2, speaker1)
+                - calc_si_snr(mix, speaker1)
+            ).mean()
+            if per1 < per2:
+                true_predicted_s1, true_predicted_s2 = (
+                    true_predicted_s2,
+                    true_predicted_s1,
+                )
+
+            metadata_s1 = {
+                "si_snr": calc_si_snr(true_predicted_s1, speaker1),
+                "si_snri": (
+                    calc_si_snr(true_predicted_s1, speaker1)
+                    - calc_si_snr(mix, speaker1)
+                ).mean(),
+            }
+            metadata_s2 = {
+                "si_snr": calc_si_snr(true_predicted_s2, speaker2),
+                "si_snri": (
+                    calc_si_snr(true_predicted_s2, speaker2)
+                    - calc_si_snr(mix, speaker2)
+                ).mean(),
+            }
 
             self.writer.add_audio(
-                audio_name=audio_path + "_original_s1", audio=speaker1
+                audio_name=audio_path,
+                audio=mix,
+                metadata=metadata_mix,
             )
             self.writer.add_audio(
-                audio_name=audio_path + "_original_s2", audio=speaker1
+                audio_name=audio_path.replace(".", "_original_s1."), audio=speaker1
             )
             self.writer.add_audio(
-                audio_name=audio_path + "_predicted_s1",
-                audio=predicted_s1,
+                audio_name=audio_path.replace(".", "_original_s2."), audio=speaker2
+            )
+            self.writer.add_audio(
+                audio_name=audio_path.replace(".", "_predicted_s1."),
+                audio=true_predicted_s1,
                 metadata=metadata_s1,
             )
             self.writer.add_audio(
-                audio_name=audio_path + "_predicted_s2",
-                audio=predicted_s2,
+                audio_name=audio_path.replace(".", "_predicted_s2."),
+                audio=true_predicted_s2,
                 metadata=metadata_s2,
             )
