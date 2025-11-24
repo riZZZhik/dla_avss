@@ -7,6 +7,12 @@ defaults:
   - transforms: example_only_instance
   - _self_
 
+writer:
+  run_name: train_rtfsnet
+
+dataloader:
+  batch_size: 16
+
 optimizer:
   _target_: torch.optim.AdamW
   lr: 3e-4
@@ -35,5 +41,6 @@ trainer:
   save_period: 5
   early_stop: ${trainer.n_epochs}
   save_dir: "saved"
+  max_grad_norm: 1
   seed: 1
   max_grad_norm: 5
