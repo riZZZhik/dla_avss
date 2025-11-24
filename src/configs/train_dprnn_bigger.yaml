@@ -1,13 +1,45 @@
 defaults:
-  - train_dprnn
+  - model: dprnn
+  - writer: cometml
+  - metrics: example
+  - datasets: avss
+  - dataloader: example
+  - transforms: example_only_instance
   - _self_
 
-model:
-  encoder_out_features: 1024
-  num_dprnn_blocks: 6
-
 writer:
-  run_name: train_dprnn_bigger
+  run_name: train_dprnn_bigger_coders
 
 dataloader:
   batch_size: 4
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 3e-4
+
+lr_scheduler:
+  _target_: torch.optim.lr_scheduler.OneCycleLR
+  max_lr: 1e-2
+  pct_start: 0.1
+  steps_per_epoch: ${trainer.epoch_len}
+  epochs: ${trainer.n_epochs}
+  anneal_strategy: cos
+
+loss_function:
+  _target_: src.loss.SI_SNR_loss
+
+trainer:
+  log_step: 50
+  n_epochs: 75
+  epoch_len: 200
+  eval_len: 100
+  device_tensors: ["mix", "speakers"] # which tensors should be on device (ex. GPU)
+  resume_from: null # null or path to the checkpoint dir with *.pth and config.yaml
+  device: auto # device name or "auto"
+  override: True # if True, will override the previous run with the same name
+  monitor: "max val_SI_SNRi" # "off" or "max/min metric_name", i.e. our goal is to maximize/minimize metric
+  save_period: 5 # checkpoint each save_period epochs in addition to the best epoch
+  early_stop: ${trainer.n_epochs} # epochs for early stopping
+  save_dir: "saved"
+  max_grad_norm: 5
+  seed: 1
