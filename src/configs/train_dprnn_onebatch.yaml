@@ -4,7 +4,7 @@ defaults:
   - _self_
 
 writer:
-  run_name: train_dprnn_onebatch
+  run_name: train_dprnn_bigger_onebatch
 
 dataloader:
   batch_size: 2

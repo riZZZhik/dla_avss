@@ -22,13 +22,44 @@ class TasNetEncoder(nn.Module):
 
         self.net = nn.Sequential(
             nn.Conv1d(
-                in_features,
-                out_features,
-                kernel_size=kernel,
-                stride=kernel // 2,
-                bias=False,
+                in_features, out_features, kernel_size=kernel, stride=kernel // 2
             ),
-            nn.ReLU(),
+            nn.Conv1d(
+                out_features,
+                out_features,
+                kernel_size=3,
+                stride=1,
+                dilation=1,
+                padding=1,
+            ),
+            nn.PReLU(),
+            nn.Conv1d(
+                out_features,
+                out_features,
+                kernel_size=3,
+                stride=1,
+                dilation=2,
+                padding=2,
+            ),
+            nn.PReLU(),
+            nn.Conv1d(
+                out_features,
+                out_features,
+                kernel_size=3,
+                stride=1,
+                dilation=4,
+                padding=4,
+            ),
+            nn.PReLU(),
+            nn.Conv1d(
+                out_features,
+                out_features,
+                kernel_size=3,
+                stride=1,
+                dilation=8,
+                padding=8,
+            ),
+            nn.PReLU(),
         )
 
     def forward(self, mix, **batch):
@@ -73,9 +104,23 @@ class TasNetDecoder(nn.Module):
         super().__init__()
 
         self.net = nn.Sequential(
-            nn.ConvTranspose1d(
-                in_features, 1, kernel_size=kernel, stride=kernel // 2, bias=False
+            nn.Conv1d(
+                in_features, in_features, kernel_size=3, stride=1, dilation=8, padding=8
             ),
+            nn.PReLU(),
+            nn.Conv1d(
+                in_features, in_features, kernel_size=3, stride=1, dilation=4, padding=4
+            ),
+            nn.PReLU(),
+            nn.Conv1d(
+                in_features, in_features, kernel_size=3, stride=1, dilation=2, padding=2
+            ),
+            nn.PReLU(),
+            nn.Conv1d(
+                in_features, in_features, kernel_size=3, stride=1, dilation=1, padding=1
+            ),
+            nn.PReLU(),
+            nn.ConvTranspose1d(in_features, 1, kernel_size=kernel, stride=kernel // 2),
         )
 
     def forward(self, separated_encoded, **batch):
