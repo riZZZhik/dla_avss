@@ -26,47 +26,39 @@ class PESQMetric(BaseMetric):
 
         if self.upit:
             val_per1 = (
-                (
-                    calc_pesq(
-                        preds_s1,
-                        speaker1,
-                        fs=self.fs,
-                        mode=self.mode,
-                        keep_same_device=self.keep_same_device,
-                    )
-                    + calc_pesq(
-                        preds_s2,
-                        speaker2,
-                        fs=self.fs,
-                        mode=self.mode,
-                        keep_same_device=self.keep_same_device,
-                    )
-                ).sum()
-                / 2
-                / preds.shape[0]
-            )
+                calc_pesq(
+                    preds_s1,
+                    speaker1,
+                    fs=self.fs,
+                    mode=self.mode,
+                    keep_same_device=self.keep_same_device,
+                )
+                + calc_pesq(
+                    preds_s2,
+                    speaker2,
+                    fs=self.fs,
+                    mode=self.mode,
+                    keep_same_device=self.keep_same_device,
+                )
+            ) * 0.5
             val_per2 = (
-                (
-                    calc_pesq(
-                        preds_s1,
-                        speaker2,
-                        fs=self.fs,
-                        mode=self.mode,
-                        keep_same_device=self.keep_same_device,
-                    )
-                    + calc_pesq(
-                        preds_s2,
-                        speaker1,
-                        fs=self.fs,
-                        mode=self.mode,
-                        keep_same_device=self.keep_same_device,
-                    )
-                ).sum()
-                / 2
-                / preds.shape[0]
-            )
+                calc_pesq(
+                    preds_s1,
+                    speaker2,
+                    fs=self.fs,
+                    mode=self.mode,
+                    keep_same_device=self.keep_same_device,
+                )
+                + calc_pesq(
+                    preds_s2,
+                    speaker1,
+                    fs=self.fs,
+                    mode=self.mode,
+                    keep_same_device=self.keep_same_device,
+                )
+            ) * 0.5
 
-            val = max(val_per1, val_per2)
+            val = torch.maximum(val_per1, val_per2).mean()
         else:
             val = (
                 (
@@ -84,9 +76,8 @@ class PESQMetric(BaseMetric):
                         mode=self.mode,
                         keep_same_device=self.keep_same_device,
                     )
-                ).sum()
-                / 2
-                / preds.shape[0]
-            )
+                )
+                * 0.5
+            ).mean()
 
         return val

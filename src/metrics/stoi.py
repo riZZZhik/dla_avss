@@ -26,43 +26,35 @@ class STOIMetric(BaseMetric):
 
         if self.upit:
             val_per1 = (
-                (
-                    calc_stoi(
-                        preds_s1,
-                        speaker1,
-                        fs=self.fs,
-                        keep_same_device=self.keep_same_device,
-                    )
-                    + calc_stoi(
-                        preds_s2,
-                        speaker2,
-                        fs=self.fs,
-                        keep_same_device=self.keep_same_device,
-                    )
-                ).sum()
-                / 2
-                / preds.shape[0]
-            )
+                calc_stoi(
+                    preds_s1,
+                    speaker1,
+                    fs=self.fs,
+                    keep_same_device=self.keep_same_device,
+                )
+                + calc_stoi(
+                    preds_s2,
+                    speaker2,
+                    fs=self.fs,
+                    keep_same_device=self.keep_same_device,
+                )
+            ) * 0.5
             val_per2 = (
-                (
-                    calc_stoi(
-                        preds_s1,
-                        speaker2,
-                        fs=self.fs,
-                        keep_same_device=self.keep_same_device,
-                    )
-                    + calc_stoi(
-                        preds_s2,
-                        speaker1,
-                        fs=self.fs,
-                        keep_same_device=self.keep_same_device,
-                    )
-                ).sum()
-                / 2
-                / preds.shape[0]
-            )
+                calc_stoi(
+                    preds_s1,
+                    speaker2,
+                    fs=self.fs,
+                    keep_same_device=self.keep_same_device,
+                )
+                + calc_stoi(
+                    preds_s2,
+                    speaker1,
+                    fs=self.fs,
+                    keep_same_device=self.keep_same_device,
+                )
+            ) * 0.5
 
-            val = max(val_per1, val_per2)
+            val = torch.maximum(val_per1, val_per2).mean()
         else:
             val = (
                 (
@@ -78,9 +70,8 @@ class STOIMetric(BaseMetric):
                         fs=self.fs,
                         keep_same_device=self.keep_same_device,
                     )
-                ).sum()
-                / 2
-                / preds.shape[0]
-            )
+                )
+                * 0.5
+            ).mean()
 
         return val
