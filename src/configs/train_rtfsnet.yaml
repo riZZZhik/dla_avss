@@ -7,6 +7,12 @@ defaults:
   - transforms: example_only_instance
   - _self_
 
+writer:
+  run_name: train_rtfsnet
+
+dataloader:
+  batch_size: 16
+
 optimizer:
   _target_: torch.optim.AdamW
   lr: 3e-4
@@ -20,7 +26,7 @@ lr_scheduler:
   anneal_strategy: cos
 
 loss_function:
-  _target_: src.loss.SI_SNR_loss  
+  _target_: src.loss.SI_SNR_loss
 
 trainer:
   log_step: 50
@@ -35,4 +41,5 @@ trainer:
   save_period: 5
   early_stop: ${trainer.n_epochs}
   save_dir: "saved"
+  max_grad_norm: 1
   seed: 1
