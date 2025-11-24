@@ -43,4 +43,3 @@ trainer:
   save_dir: "saved"
   max_grad_norm: 5
   seed: 1
-  max_grad_norm: 5
