@@ -20,7 +20,7 @@ lr_scheduler:
   anneal_strategy: cos
 
 loss_function:
-  _target_: src.loss.SI_SNR_loss  
+  _target_: src.loss.SI_SNR_loss
 
 trainer:
   log_step: 50
@@ -36,3 +36,4 @@ trainer:
   early_stop: ${trainer.n_epochs}
   save_dir: "saved"
   seed: 1
+  max_grad_norm: 5
