@@ -1,4 +1,5 @@
 defaults:
+<<<<<<< HEAD
   - model: dprnn
   - writer: cometml
   - metrics: example
@@ -8,10 +9,17 @@ defaults:
   - _self_
 
 writer:
+<<<<<<<< HEAD:src/configs/train_dprnn_bigger.yaml
   run_name: train_dprnn_bigger_coders
 
 dataloader:
   batch_size: 4
+========
+  run_name: train_dprnn
+
+dataloader:
+  batch_size: 6
+>>>>>>>> 0e54744 ([ADD] train configs):src/configs/train_dprnn.yaml
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -41,5 +49,24 @@ trainer:
   save_period: 5 # checkpoint each save_period epochs in addition to the best epoch
   early_stop: ${trainer.n_epochs} # epochs for early stopping
   save_dir: "saved"
+<<<<<<<< HEAD:src/configs/train_dprnn_bigger.yaml
+========
   max_grad_norm: 5
   seed: 1
+>>>>>>>> 0e54744 ([ADD] train configs):src/configs/train_dprnn.yaml
+  max_grad_norm: 5
+  seed: 1
+=======
+  - train_dprnn
+  - _self_
+
+model:
+  encoder_out_features: 1024
+  num_dprnn_blocks: 6
+
+writer:
+  run_name: train_dprnn_bigger
+
+dataloader:
+  batch_size: 4
+>>>>>>> 0e54744 ([ADD] train configs)
