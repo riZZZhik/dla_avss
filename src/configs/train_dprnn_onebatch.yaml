@@ -11,3 +11,4 @@ dataloader:
 
 trainer:
   n_epochs: 5
+  epoch_len: 100
