@@ -3,6 +3,7 @@ from tqdm.auto import tqdm
 
 from src.metrics.tracker import MetricTracker
 from src.trainer.base_trainer import BaseTrainer
+from src.utils.utils import get_true_predictions
 
 
 class Inferencer(BaseTrainer):
@@ -125,27 +126,43 @@ class Inferencer(BaseTrainer):
 
         if metrics is not None:
             for met in self.metrics["inference"]:
-                metrics.update(met.name, met(**batch))
+                if part != "test":
+                    metrics.update(met.name, met(**batch))
 
         # Some saving logic. This is an example
         # Use if you need to save predictions on disk
 
-        batch_size = batch["logits"].shape[0]
+        batch_size = batch["preds"].shape[0]
         current_id = batch_idx * batch_size
 
         for i in range(batch_size):
             # clone because of
             # https://github.com/pytorch/pytorch/issues/1995
-            logits = batch["logits"][i].clone()
-            label = batch["labels"][i].clone()
-            pred_label = logits.argmax(dim=-1)
+            predicted_s1 = batch["preds"][i, 0].clone()
+            predicted_s2 = batch["preds"][i, 1].clone()
+            mix = batch["mix"][i].clone()
 
             output_id = current_id + i
 
+            speaker1, speaker2 = [], []
+            if "speakers" in batch:
+                speaker1 = batch["speakers"][i, 0].clone()
+                speaker2 = batch["speakers"][i, 1].clone()
+
+                true_predicted_s1, true_predicted_s2 = get_true_predictions(
+                    predicted_s1, predicted_s2, mix, speaker1, speaker2
+                )
+            else:
+                true_predicted_s1, true_predicted_s2 = predicted_s1, predicted_s2
+
             output = {
-                "pred_label": pred_label,
-                "label": label,
+                "Predicted s1": true_predicted_s1,
+                "Predicted s2": true_predicted_s2,
             }
+
+            if "speakers" in batch:
+                output["GT speaker1"] = speaker1
+                output["GT speaker2"] = speaker2
 
             if self.save_path is not None:
                 # you can use safetensors or other lib here
