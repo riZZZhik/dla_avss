@@ -8,10 +8,10 @@ defaults:
   - _self_
 
 writer:
-  run_name: train_dprnn_bigger
+  run_name: train_dprnn_bigger_nogradnorm
 
 dataloader:
-  batch_size: 6
+  batch_size: 5
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -30,7 +30,7 @@ loss_function:
 
 trainer:
   log_step: 50
-  n_epochs: 75
+  n_epochs: 40
   epoch_len: 200
   eval_len: 100
   device_tensors: ["mix", "speakers"] # which tensors should be on device (ex. GPU)
@@ -41,5 +41,4 @@ trainer:
   save_period: 5 # checkpoint each save_period epochs in addition to the best epoch
   early_stop: ${trainer.n_epochs} # epochs for early stopping
   save_dir: "saved"
-  max_grad_norm: 5
   seed: 1
