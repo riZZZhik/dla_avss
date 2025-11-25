@@ -142,7 +142,7 @@ class Inferencer(BaseTrainer):
             predicted_s2 = batch["preds"][i, 1].clone()
             mix = batch["mix"][i].clone()
             audio_path = batch["audio_path"][i]
-            audio_filename = audio_path[audio_path.find("/") + 1 :]
+            audio_filename = audio_path[audio_path.rfind("/") + 1 :]
             sample_rate = batch["sample_rate"][i]
 
             speaker1, speaker2 = [], []
