@@ -1,10 +1,14 @@
 defaults:
   - model: dprnn
   - metrics: example
-  - datasets: custom # we do not want to run inference on training data
+  - datasets: eval # we do not want to run inference on training data
   - dataloader: example
   - transforms: example
   - _self_
+
+dataloader:
+  batch_size: 10
+
 inferencer:
   device_tensors: ["mix", "speakers"] # which tensors should be on device (ex. GPU)
   device: auto # device name or "auto"
