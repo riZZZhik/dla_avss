@@ -160,12 +160,12 @@ class Inferencer(BaseTrainer):
                 # you can use safetensors or other lib here
                 torchaudio.save(
                     uri=self.save_path / part / f"s1/{audio_filename}",
-                    src=true_predicted_s1,
+                    src=true_predicted_s1.unsqueeze(0),
                     sample_rate=sample_rate,
                 )
                 torchaudio.save(
                     uri=self.save_path / part / f"s2/{audio_filename}",
-                    src=true_predicted_s2,
+                    src=true_predicted_s2.unsqueeze(0),
                     sample_rate=sample_rate,
                 )
 
