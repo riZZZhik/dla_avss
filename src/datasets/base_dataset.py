@@ -26,6 +26,8 @@ class BaseDataset(Dataset):
         max_audio_length=None,
         shuffle_index=False,
         instance_transforms=None,
+        *args,
+        **kwargs,
     ):
         """
         Args:
