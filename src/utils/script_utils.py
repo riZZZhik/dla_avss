@@ -50,28 +50,37 @@ def calc_metrics():
     output_s2_dir = Path(sys.argv[2]) / "s2"
     groundtruth_s1_dir = Path(sys.argv[3]) / "s1"
     groundtruth_s2_dir = Path(sys.argv[3]) / "s2"
-    mix_dir = Path(sys.argv[4])
 
-    mix_filenames = os.listdir(mix_dir)
+    with_mix = False
+    if len(sys.argv) > 4:
+        with_mix = True
+
+    output_s1_filenames = os.listdir(output_s1_dir)
     metrics = {
         "SI-SNR": [],
-        "SI-SNRi": [],
-        "SDRi": [],
         "PESQ": [],
         "STOI": [],
     }
-    for mix_filename in mix_filenames:
-        predicted_s1, _ = torchaudio.load(str(output_s1_dir / mix_filename))
-        predicted_s2, _ = torchaudio.load(str(output_s2_dir / mix_filename))
-        groundtruth_s1, _ = torchaudio.load(str(groundtruth_s1_dir / mix_filename))
-        groundtruth_s2, _ = torchaudio.load(str(groundtruth_s2_dir / mix_filename))
-        mix_audio, _ = torchaudio.load(str(mix_dir / mix_filename))
+
+    if with_mix:
+        mix_dir = Path(sys.argv[4])
+        metrics["SI-SNRi"] = []
+        metrics["SDRi"] = []
+
+    for output_s1_filename in output_s1_filenames:
+        predicted_s1, _ = torchaudio.load(str(output_s1_dir / output_s1_filename))
+        predicted_s2, _ = torchaudio.load(str(output_s2_dir / output_s1_filename))
+        groundtruth_s1, _ = torchaudio.load(
+            str(groundtruth_s1_dir / output_s1_filename)
+        )
+        groundtruth_s2, _ = torchaudio.load(
+            str(groundtruth_s2_dir / output_s1_filename)
+        )
 
         predicted_s1 = predicted_s1[0:1, :]  # remove all channels but the first
         predicted_s2 = predicted_s2[0:1, :]
         groundtruth_s1 = groundtruth_s1[0:1, :]
         groundtruth_s2 = groundtruth_s2[0:1, :]
-        mix_audio = mix_audio[0:1, :]
 
         predicted_s1, predicted_s2 = get_true_predictions(
             predicted_s1, predicted_s2, groundtruth_s1, groundtruth_s2
@@ -98,24 +107,29 @@ def calc_metrics():
             )
             / 2
         )
-        metrics["SI-SNRi"].append(
-            (
-                calc_si_snr(predicted_s1, groundtruth_s1)
-                - calc_si_snr(mix_audio, groundtruth_s1)
-                + calc_si_snr(predicted_s1, groundtruth_s1)
-                - calc_si_snr(mix_audio, groundtruth_s2)
+
+        if with_mix:
+            mix_audio, _ = torchaudio.load(str(mix_dir / output_s1_filename))
+            mix_audio = mix_audio[0:1, :]
+
+            metrics["SI-SNRi"].append(
+                (
+                    calc_si_snr(predicted_s1, groundtruth_s1)
+                    - calc_si_snr(mix_audio, groundtruth_s1)
+                    + calc_si_snr(predicted_s1, groundtruth_s1)
+                    - calc_si_snr(mix_audio, groundtruth_s2)
+                )
+                / 2
             )
-            / 2
-        )
-        metrics["SI-SNRi"].append(
-            (
-                calc_sdr(predicted_s1, groundtruth_s1)
-                - calc_sdr(mix_audio, groundtruth_s1)
-                + calc_sdr(predicted_s1, groundtruth_s1)
-                - calc_sdr(mix_audio, groundtruth_s2)
+            metrics["SI-SNRi"].append(
+                (
+                    calc_sdr(predicted_s1, groundtruth_s1)
+                    - calc_sdr(mix_audio, groundtruth_s1)
+                    + calc_sdr(predicted_s1, groundtruth_s1)
+                    - calc_sdr(mix_audio, groundtruth_s2)
+                )
+                / 2
             )
-            / 2
-        )
 
     for metric_name in metrics.keys():
         print(f"Mean {metric_name}: {tensor(metrics[metric_name]).mean()}")
