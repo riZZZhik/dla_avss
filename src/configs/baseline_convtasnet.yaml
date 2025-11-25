@@ -27,7 +27,7 @@ lr_scheduler:
 
 loss_function:
   _target_: src.loss.SI_SNR_loss
-  upit: True   # PIT-режим, как вы тестили
+  upit: True   
 
 trainer:
   log_step: 50
