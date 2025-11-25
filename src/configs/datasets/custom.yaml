@@ -1,6 +1,6 @@
-eval:
-  _target_: src.datasets.AVSSDataset
+test:
+  _target_: src.datasets.CustomDirAVDataset
   data_dir: "/content"
   index_dir: "/content"
-  split: "val"
+  split: "test"
   instance_transforms: ${transforms.instance_transforms.inference}

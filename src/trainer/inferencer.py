@@ -152,7 +152,7 @@ class Inferencer(BaseTrainer):
                 speaker2 = batch["speakers"][i, 1].clone()
 
                 true_predicted_s1, true_predicted_s2 = get_true_predictions(
-                    predicted_s1, predicted_s2, mix, speaker1, speaker2
+                    predicted_s1, predicted_s2, speaker1, speaker2, mix
                 )
             else:
                 true_predicted_s1, true_predicted_s2 = predicted_s1, predicted_s2
@@ -160,16 +160,16 @@ class Inferencer(BaseTrainer):
             if self.save_path is not None:
                 save_path_s1 = self.save_path / part / "s1"
                 save_path_s2 = self.save_path / part / "s2"
-                os.makedirs(os.path.dirname(save_path_s1), exist_ok=True)
-                os.makedirs(os.path.dirname(save_path_s2), exist_ok=True)
+                os.makedirs(save_path_s1, exist_ok=True)
+                os.makedirs(save_path_s2, exist_ok=True)
                 torchaudio.save(
                     uri=save_path_s1 / audio_filename,
-                    src=true_predicted_s1.unsqueeze(0),
+                    src=true_predicted_s1.cpu().unsqueeze(0),
                     sample_rate=sample_rate,
                 )
                 torchaudio.save(
                     uri=save_path_s2 / audio_filename,
-                    src=true_predicted_s2.unsqueeze(0),
+                    src=true_predicted_s2.cpu().unsqueeze(0),
                     sample_rate=sample_rate,
                 )
 
