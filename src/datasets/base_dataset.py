@@ -78,6 +78,7 @@ class BaseDataset(Dataset):
         instance_data = {
             "mix": mix,
             "audio_path": mix_audio_path,
+            "sample_rate": self.target_sr,
         }
 
         if (
