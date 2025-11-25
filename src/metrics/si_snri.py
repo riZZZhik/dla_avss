@@ -20,24 +20,16 @@ class SI_SNRiMetric(BaseMetric):
         speaker2 = speakers[..., 1, :]
 
         val_per1 = (
-            (
-                calc_si_snr(preds_s1, speaker1)
-                - calc_si_snr(mix, speaker1)
-                + calc_si_snr(preds_s2, speaker2)
-                - calc_si_snr(mix, speaker2)
-            ).sum()
-            / 2
-            / preds.shape[0]
-        )
+            calc_si_snr(preds_s1, speaker1)
+            - calc_si_snr(mix, speaker1)
+            + calc_si_snr(preds_s2, speaker2)
+            - calc_si_snr(mix, speaker2)
+        ) * 0.5
         val_per2 = (
-            (
-                calc_si_snr(preds_s1, speaker2)
-                - calc_si_snr(mix, speaker2)
-                + calc_si_snr(preds_s2, speaker1)
-                - calc_si_snr(mix, speaker1)
-            ).sum()
-            / 2
-            / preds.shape[0]
-        )
+            calc_si_snr(preds_s1, speaker2)
+            - calc_si_snr(mix, speaker2)
+            + calc_si_snr(preds_s2, speaker1)
+            - calc_si_snr(mix, speaker1)
+        ) * 0.5
 
-        return max(val_per1, val_per2)
+        return torch.maximum(val_per1, val_per2).mean()

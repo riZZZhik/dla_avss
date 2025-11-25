@@ -30,7 +30,7 @@ loss_function:
 
 trainer:
   log_step: 50
-  n_epochs: 50
+  n_epochs: 75
   epoch_len: 200
   eval_len: 100
   device_tensors: ["mix", "speakers", "vis_s1", "vis_s2"]
@@ -41,6 +41,4 @@ trainer:
   save_period: 5
   early_stop: ${trainer.n_epochs}
   save_dir: "saved"
-  max_grad_norm: 1
   seed: 1
-  max_grad_norm: 5

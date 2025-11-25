@@ -1,14 +1,13 @@
 defaults:
-  - train_dprnn
+  - train_rtfsnet
   - override datasets: onebatchtest
   - _self_
 
 writer:
-  run_name: train_dprnn_bigger_onebatch
+  run_name: train_rtfsnet_onebatch
 
 dataloader:
   batch_size: 2
 
 trainer:
   n_epochs: 5
-  epoch_len: 100
