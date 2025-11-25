@@ -1,4 +1,5 @@
 import torch
+import torchaudio
 from tqdm.auto import tqdm
 
 from src.metrics.tracker import MetricTracker
@@ -133,7 +134,6 @@ class Inferencer(BaseTrainer):
         # Use if you need to save predictions on disk
 
         batch_size = batch["preds"].shape[0]
-        current_id = batch_idx * batch_size
 
         for i in range(batch_size):
             # clone because of
@@ -141,8 +141,9 @@ class Inferencer(BaseTrainer):
             predicted_s1 = batch["preds"][i, 0].clone()
             predicted_s2 = batch["preds"][i, 1].clone()
             mix = batch["mix"][i].clone()
-
-            output_id = current_id + i
+            audio_path = batch["audio_path"][i].clone()
+            audio_filename = audio_path[audio_path.find("/") + 1 :]
+            sample_rate = batch["sample_rate"][i].clone()
 
             speaker1, speaker2 = [], []
             if "speakers" in batch:
@@ -155,18 +156,18 @@ class Inferencer(BaseTrainer):
             else:
                 true_predicted_s1, true_predicted_s2 = predicted_s1, predicted_s2
 
-            output = {
-                "Predicted s1": true_predicted_s1,
-                "Predicted s2": true_predicted_s2,
-            }
-
-            if "speakers" in batch:
-                output["GT speaker1"] = speaker1
-                output["GT speaker2"] = speaker2
-
             if self.save_path is not None:
                 # you can use safetensors or other lib here
-                torch.save(output, self.save_path / part / f"output_{output_id}.pth")
+                torchaudio.save(
+                    uri=self.save_path / part / f"s1/{audio_filename}",
+                    src=true_predicted_s1,
+                    sample_rate=sample_rate,
+                )
+                torchaudio.save(
+                    uri=self.save_path / part / f"s2/{audio_filename}",
+                    src=true_predicted_s2,
+                    sample_rate=sample_rate,
+                )
 
         return batch
 

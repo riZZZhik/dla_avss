@@ -21,13 +21,15 @@ def download_custom_dataset():
     os.system("wget '{}' -O '{}'".format(json_res["href"], filename))
 
 
-def download_best_checkpoint():
+def download_checkpoint():
     """
     Downloads best model checkpoint into folder = sys.argv[2]
+    from repo = = sys.argv[3]
+    and model_file = sys.argv[4]
     """
     hf_hub_download(
-        repo_id="Saneksha/avss_test",
-        filename="model_best.pth",
+        repo_id=sys.argv[3],
+        filename=sys.argv[4],
         local_dir=sys.argv[2],
     )
 
