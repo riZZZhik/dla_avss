@@ -50,6 +50,7 @@ def calc_metrics():
     output_s2_dir = Path(sys.argv[2]) / "s2"
     groundtruth_s1_dir = Path(sys.argv[3]) / "s1"
     groundtruth_s2_dir = Path(sys.argv[3]) / "s2"
+    print(output_s1_dir, groundtruth_s1_dir)
 
     with_mix = False
     if len(sys.argv) > 4:
