@@ -1,12 +1,6 @@
-val:
+eval:
   _target_: src.datasets.AVSSDataset
-  data_dir: "/kaggle/working/"
-  index_dir: "/kaggle/working/"
-  split: "val"
-  instance_transforms: ${transforms.instance_transforms.inference}
-test:
-  _target_: src.datasets.AVSSDataset
-  data_dir: "/kaggle/working/"
-  index_dir: "/kaggle/working/"
+  data_dir: "/content"
+  index_dir: "/content"
   split: "test"
   instance_transforms: ${transforms.instance_transforms.inference}
