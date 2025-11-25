@@ -8,7 +8,7 @@ from huggingface_hub import hf_hub_download
 
 def download_custom_dataset():
     """
-    Downloads custom dataset from url sys.argv[2]
+    Downloads custom dataset from url sys.argv[2] into current directory
     Reference: https://gist.github.com/Yegorov/dc61c42aa4e89e139cd8248f59af6b3e
     """
     base_url = (
