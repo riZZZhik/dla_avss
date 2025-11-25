@@ -4,8 +4,9 @@ import pandas as pd
 
 from src.logger.utils import plot_spectrogram, plot_waveform
 from src.metrics.tracker import MetricTracker
-from src.metrics.utils import calc_pesq, calc_sdr, calc_si_snr, calc_stoi
+from src.metrics.utils import calc_si_snr
 from src.trainer.base_trainer import BaseTrainer
+from src.utils.utils import get_true_predictions
 
 
 class Trainer(BaseTrainer):
@@ -103,9 +104,9 @@ class Trainer(BaseTrainer):
         tuples = list(zip(preds, speakers, audio_path, mix))
 
         for preds, speakers, audio_path, mix in tuples[:examples_to_log]:
-            true_predicted_s1 = preds[..., 0, :]
+            predicted_s1 = preds[..., 0, :]
             speaker1 = speakers[..., 0, :]
-            true_predicted_s2 = preds[..., 1, :]
+            predicted_s2 = preds[..., 1, :]
             speaker2 = speakers[..., 1, :]
 
             metadata_mix = {
@@ -113,23 +114,9 @@ class Trainer(BaseTrainer):
                 "si_snr (mix, s2)": calc_si_snr(mix, speaker2),
             }
 
-            per1 = (
-                calc_si_snr(true_predicted_s1, speaker1)
-                - calc_si_snr(mix, speaker1)
-                + calc_si_snr(true_predicted_s2, speaker2)
-                - calc_si_snr(mix, speaker2)
-            ).mean()
-            per2 = (
-                calc_si_snr(true_predicted_s1, speaker2)
-                - calc_si_snr(mix, speaker2)
-                + calc_si_snr(true_predicted_s2, speaker1)
-                - calc_si_snr(mix, speaker1)
-            ).mean()
-            if per1 < per2:
-                true_predicted_s1, true_predicted_s2 = (
-                    true_predicted_s2,
-                    true_predicted_s1,
-                )
+            true_predicted_s1, true_predicted_s2 = get_true_predictions(
+                predicted_s1, predicted_s2, mix, speaker1, speaker2
+            )
 
             metadata_s1 = {
                 "si_snr": calc_si_snr(true_predicted_s1, speaker1),

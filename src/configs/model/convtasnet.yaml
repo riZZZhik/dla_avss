@@ -1,0 +1,10 @@
+_target_: src.model.conv_tasnet_model.ConvTasNetModel
+
+encoder_out_features: 512   
+kernel: 16            
+
+bottleneck_size: 128        
+n_blocks: 8               
+n_repeats: 3               
+n_src: 2                   
+conv_dropout: 0.0       
