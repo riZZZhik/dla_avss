@@ -7,6 +7,7 @@ from pathlib import Path
 import torchaudio
 from huggingface_hub import hf_hub_download
 from torch import tensor
+from tqdm.auto import tqdm
 
 from src.metrics.utils import calc_pesq, calc_sdr, calc_si_snr, calc_stoi
 from src.utils.utils import get_true_predictions
@@ -67,7 +68,7 @@ def calc_metrics():
         metrics["SI-SNRi"] = []
         metrics["SDRi"] = []
 
-    for output_s1_filename in output_s1_filenames:
+    for output_s1_filename in tqdm(output_s1_filenames):
         predicted_s1, _ = torchaudio.load(str(output_s1_dir / output_s1_filename))
         predicted_s2, _ = torchaudio.load(str(output_s2_dir / output_s1_filename))
         groundtruth_s1, _ = torchaudio.load(
