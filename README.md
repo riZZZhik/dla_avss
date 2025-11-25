@@ -16,8 +16,13 @@ This repository contains several architectures and training configs for the task
 - **Conv-TasNet–like model** — convolutional TCN-based separator in the time domain;
 - **AVRTFSNet (audio-visual RTFS)** — recurrent time–frequency model that additionally uses visual embeddings (mouth crops).
 
-Best checkpoints can be found in a DEMO.ipynb 
-
+Best checkpoints can be found in a DEMO.ipynb or downloaded by
+  ```
+MODEL_DIR = "/content/model"
+model_filename = "dprnn_5-76.pth"
+! mkdir -p {MODEL_DIR}
+! uv run python3 src/utils/script_utils.py download_checkpoint "$MODEL_DIR" "your path to store weights"
+  ```
 
 ## Installation
 
@@ -110,6 +115,14 @@ python3 train.py -cn=baseline_dprnn \
   datasets.val.data_dir=/path/to/dla_dataset \
   dataloader.batch_size=8 \
   trainer.n_epochs=100
+```
+Results will be stored in ROOT_PATH / "data" / "saved" / test_output" 
+
+To calculate metrics on any dataset
+```
+PATH_TO_SPEAKERS_RECS = "your parh to ground truth recs"
+mix_path = dataset_path + "/audio"
+! uv run python3 src/utils/script_utils.py calc_metrics "$OUTPUT_DIR" "$PATH_TO_SPEAKERS_RECS" "$mix_path"
 ```
 
 ## Credits
