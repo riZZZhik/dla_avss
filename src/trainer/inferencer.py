@@ -1,4 +1,7 @@
+import os
+
 import torch
+import torchaudio
 from tqdm.auto import tqdm
 
 from src.metrics.tracker import MetricTracker
@@ -133,7 +136,6 @@ class Inferencer(BaseTrainer):
         # Use if you need to save predictions on disk
 
         batch_size = batch["preds"].shape[0]
-        current_id = batch_idx * batch_size
 
         for i in range(batch_size):
             # clone because of
@@ -141,8 +143,9 @@ class Inferencer(BaseTrainer):
             predicted_s1 = batch["preds"][i, 0].clone()
             predicted_s2 = batch["preds"][i, 1].clone()
             mix = batch["mix"][i].clone()
-
-            output_id = current_id + i
+            audio_path = batch["audio_path"][i]
+            audio_filename = audio_path[audio_path.rfind("/") + 1 :]
+            sample_rate = batch["sample_rate"][i]
 
             speaker1, speaker2 = [], []
             if "speakers" in batch:
@@ -155,18 +158,21 @@ class Inferencer(BaseTrainer):
             else:
                 true_predicted_s1, true_predicted_s2 = predicted_s1, predicted_s2
 
-            output = {
-                "Predicted s1": true_predicted_s1,
-                "Predicted s2": true_predicted_s2,
-            }
-
-            if "speakers" in batch:
-                output["GT speaker1"] = speaker1
-                output["GT speaker2"] = speaker2
-
             if self.save_path is not None:
-                # you can use safetensors or other lib here
-                torch.save(output, self.save_path / part / f"output_{output_id}.pth")
+                save_path_s1 = self.save_path / part / "s1"
+                save_path_s2 = self.save_path / part / "s2"
+                os.makedirs(os.path.dirname(save_path_s1), exist_ok=True)
+                os.makedirs(os.path.dirname(save_path_s2), exist_ok=True)
+                torchaudio.save(
+                    uri=save_path_s1 / audio_filename,
+                    src=true_predicted_s1.unsqueeze(0),
+                    sample_rate=sample_rate,
+                )
+                torchaudio.save(
+                    uri=save_path_s2 / audio_filename,
+                    src=true_predicted_s2.unsqueeze(0),
+                    sample_rate=sample_rate,
+                )
 
         return batch
 

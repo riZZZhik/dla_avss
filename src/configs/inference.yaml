@@ -1,5 +1,5 @@
 defaults:
-  - model: baseline
+  - model: dprnn
   - metrics: example
   - datasets: eval # we do not want to run inference on training data
   - dataloader: example
