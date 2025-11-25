@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import torchaudio
+
 from src.datasets.base_dataset import BaseDataset
 
 
@@ -29,8 +31,12 @@ class CustomDirAVDataset(BaseDataset):
                 s1_id = stem
                 s2_id = stem
 
+            t_info = torchaudio.info(str(mix_path))
+            audio_len = t_info.num_frames / t_info.sample_rate
+
             row = {
                 "audio_path": str(mix_path),
+                "audio_len": audio_len,
             }
 
             s1_audio = s1_dir / mix_name
