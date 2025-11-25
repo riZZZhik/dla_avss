@@ -160,8 +160,8 @@ class Inferencer(BaseTrainer):
             if self.save_path is not None:
                 save_path_s1 = self.save_path / part / "s1"
                 save_path_s2 = self.save_path / part / "s2"
-                os.makedirs(os.path.dirname(save_path_s1), exist_ok=True)
-                os.makedirs(os.path.dirname(save_path_s2), exist_ok=True)
+                os.makedirs(save_path_s1, exist_ok=True)
+                os.makedirs(save_path_s2, exist_ok=True)
                 torchaudio.save(
                     uri=save_path_s1 / audio_filename,
                     src=true_predicted_s1.unsqueeze(0),
