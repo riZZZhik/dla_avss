@@ -27,13 +27,15 @@ def calc_sdr(preds, target, **kwargs) -> float:
     return val
 
 
-def calc_pesq(preds, target, fs, mode, keep_same_device, **kwargs) -> float:
+def calc_pesq(
+    preds, target, fs=16000, mode="wb", keep_same_device=True, **kwargs
+) -> float:
     return perceptual_evaluation_speech_quality(
         preds, target, fs, mode, keep_same_device=keep_same_device
     )
 
 
-def calc_stoi(preds, target, fs, keep_same_device, **kwargs) -> float:
+def calc_stoi(preds, target, fs=16000, keep_same_device=True, **kwargs) -> float:
     return short_time_objective_intelligibility(
         preds, target, fs, keep_same_device=keep_same_device
     ).float()
