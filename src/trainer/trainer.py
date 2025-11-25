@@ -115,7 +115,7 @@ class Trainer(BaseTrainer):
             }
 
             true_predicted_s1, true_predicted_s2 = get_true_predictions(
-                predicted_s1, predicted_s2, mix, speaker1, speaker2
+                predicted_s1, predicted_s2, speaker1, speaker2, mix
             )
 
             metadata_s1 = {

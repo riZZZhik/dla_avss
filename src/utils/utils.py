@@ -1,7 +1,7 @@
 from src.metrics.utils import calc_si_snr
 
 
-def get_true_predictions(pred_s1, pred_s2, mix, speaker1, speaker2):
+def get_true_predictions(pred_s1, pred_s2, speaker1, speaker2, mix=None):
     """
     Returns preds for speaker1 and speaker2 with the biggest si_snri
 
@@ -15,19 +15,26 @@ def get_true_predictions(pred_s1, pred_s2, mix, speaker1, speaker2):
         Prediction_for_s1 (Tensor): the most appropriate prediction for speaker1.
         Prediction_for_s2 (Tensor): the most appropriate prediction for speaker2.
     """
-
-    permutation_11_22 = (
-        calc_si_snr(pred_s1, speaker1)
-        - calc_si_snr(mix, speaker1)
-        + calc_si_snr(pred_s2, speaker2)
-        - calc_si_snr(mix, speaker2)
-    ).mean()
-    permutation_12_21 = (
-        calc_si_snr(pred_s1, speaker2)
-        - calc_si_snr(mix, speaker2)
-        + calc_si_snr(pred_s2, speaker1)
-        - calc_si_snr(mix, speaker1)
-    ).mean()
+    if mix is not None:
+        permutation_11_22 = (
+            calc_si_snr(pred_s1, speaker1)
+            - calc_si_snr(mix, speaker1)
+            + calc_si_snr(pred_s2, speaker2)
+            - calc_si_snr(mix, speaker2)
+        ).mean()
+        permutation_12_21 = (
+            calc_si_snr(pred_s1, speaker2)
+            - calc_si_snr(mix, speaker2)
+            + calc_si_snr(pred_s2, speaker1)
+            - calc_si_snr(mix, speaker1)
+        ).mean()
+    else:
+        permutation_11_22 = (
+            calc_si_snr(pred_s1, speaker1) + calc_si_snr(pred_s2, speaker2)
+        ).mean()
+        permutation_12_21 = (
+            calc_si_snr(pred_s1, speaker2) + calc_si_snr(pred_s2, speaker1)
+        ).mean()
 
     if permutation_11_22 < permutation_12_21:
         return pred_s2, pred_s1
