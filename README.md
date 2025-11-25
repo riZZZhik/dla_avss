@@ -1,4 +1,4 @@
-# Automatic Speech Recognition (ASR) with PyTorch
+# Audio-Visual Source Separation (AVSS) with PyTorch
 
 <p align="center">
   <a href="#about">About</a> •
@@ -60,6 +60,7 @@ Follow these steps to install the project:
    ```
 
 The code is designed to work with the DLA AVSS dataset in the following directory structure:
+```
 dla_dataset
 ├── audio
 │   ├── mix
@@ -74,8 +75,7 @@ dla_dataset
 └── mouths
     ├── <speaker_id>.npz      # mouth crops or embeddings (for AV models)
     └── ...
-
-
+```
 In Hydra configs this path is typically referenced as:
   ```
 datasets:
