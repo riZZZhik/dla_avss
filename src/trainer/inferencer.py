@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torchaudio
 from tqdm.auto import tqdm
@@ -157,14 +159,17 @@ class Inferencer(BaseTrainer):
                 true_predicted_s1, true_predicted_s2 = predicted_s1, predicted_s2
 
             if self.save_path is not None:
-                # you can use safetensors or other lib here
+                save_path_s1 = self.save_path / part / "s1"
+                save_path_s2 = self.save_path / part / "s2"
+                os.makedirs(os.path.dirname(save_path_s1), exist_ok=True)
+                os.makedirs(os.path.dirname(save_path_s2), exist_ok=True)
                 torchaudio.save(
-                    uri=self.save_path / part / f"s1/{audio_filename}",
+                    uri=save_path_s1 / audio_filename,
                     src=true_predicted_s1.unsqueeze(0),
                     sample_rate=sample_rate,
                 )
                 torchaudio.save(
-                    uri=self.save_path / part / f"s2/{audio_filename}",
+                    uri=save_path_s2 / audio_filename,
                     src=true_predicted_s2.unsqueeze(0),
                     sample_rate=sample_rate,
                 )
