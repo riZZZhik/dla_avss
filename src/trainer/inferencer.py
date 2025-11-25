@@ -164,12 +164,12 @@ class Inferencer(BaseTrainer):
                 os.makedirs(save_path_s2, exist_ok=True)
                 torchaudio.save(
                     uri=save_path_s1 / audio_filename,
-                    src=true_predicted_s1.unsqueeze(0),
+                    src=true_predicted_s1.cpu().unsqueeze(0),
                     sample_rate=sample_rate,
                 )
                 torchaudio.save(
                     uri=save_path_s2 / audio_filename,
-                    src=true_predicted_s2.unsqueeze(0),
+                    src=true_predicted_s2.cpu().unsqueeze(0),
                     sample_rate=sample_rate,
                 )
 
