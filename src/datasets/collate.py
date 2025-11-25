@@ -4,6 +4,7 @@ import torch
 def collate_fn(dataset_items: list[dict]):
     mixs = [item["mix"] for item in dataset_items]
     audio_paths = [item["audio_path"] for item in dataset_items]
+    audio_srs = [item["sample_rate"] for item in dataset_items]
 
     assert torch.tensor(
         [len(mix) == len(mixs[0]) for mix in mixs]
@@ -12,6 +13,7 @@ def collate_fn(dataset_items: list[dict]):
     res = {
         "mix": torch.stack(mixs, dim=0),
         "audio_path": audio_paths,
+        "sample_rate": audio_srs,
     }
 
     has_speakers = "speakers" in dataset_items[0]

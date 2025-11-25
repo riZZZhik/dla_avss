@@ -14,6 +14,7 @@ pandas
 wandb
 comet_ml
 hydra-core
+huggingface_hub
 
 black
 isort

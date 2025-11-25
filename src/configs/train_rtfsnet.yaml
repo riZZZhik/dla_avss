@@ -41,5 +41,4 @@ trainer:
   save_period: 5
   early_stop: ${trainer.n_epochs}
   save_dir: "saved"
-  max_grad_norm: 5
   seed: 1

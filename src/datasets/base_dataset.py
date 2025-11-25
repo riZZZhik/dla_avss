@@ -26,6 +26,8 @@ class BaseDataset(Dataset):
         max_audio_length=None,
         shuffle_index=False,
         instance_transforms=None,
+        *args,
+        **kwargs,
     ):
         """
         Args:
@@ -69,7 +71,6 @@ class BaseDataset(Dataset):
             instance_data (dict): dict, containing instance
                 (a single dataset element).
         """
-        # TODO добавить чтение видео фалйа для модели avss
         data_dict = self._index[ind]
         mix_audio_path = data_dict["audio_path"]
         mix = self.load_audio(mix_audio_path).squeeze()
@@ -77,6 +78,7 @@ class BaseDataset(Dataset):
         instance_data = {
             "mix": mix,
             "audio_path": mix_audio_path,
+            "sample_rate": self.target_sr,
         }
 
         if (

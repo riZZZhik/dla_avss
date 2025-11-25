@@ -30,7 +30,7 @@ loss_function:
 
 trainer:
   log_step: 50
-  n_epochs: 40
+  n_epochs: 75
   epoch_len: 200
   eval_len: 100
   device_tensors: ["mix", "speakers"] # which tensors should be on device (ex. GPU)

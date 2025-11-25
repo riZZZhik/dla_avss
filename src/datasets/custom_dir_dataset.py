@@ -1,12 +1,14 @@
 from pathlib import Path
 
+import torchaudio
+
 from src.datasets.base_dataset import BaseDataset
 
 
 class CustomDirAVDataset(BaseDataset):
 
-    def __init__(self, root_dir: str, *args, **kwargs):
-        root_dir = Path(root_dir)
+    def __init__(self, data_dir: str, *args, **kwargs):
+        root_dir = Path(data_dir)
         audio_root = root_dir / "audio"
         mix_dir = audio_root / "mix"
         s1_dir = audio_root / "s1"
@@ -21,7 +23,7 @@ class CustomDirAVDataset(BaseDataset):
                 continue
 
             mix_name = mix_path.name
-            stem = mix_path.stem  
+            stem = mix_path.stem
 
             if "_" in stem:
                 s1_id, s2_id = stem.split("_", 1)
@@ -29,8 +31,12 @@ class CustomDirAVDataset(BaseDataset):
                 s1_id = stem
                 s2_id = stem
 
+            t_info = torchaudio.info(str(mix_path))
+            audio_len = t_info.num_frames / t_info.sample_rate
+
             row = {
                 "audio_path": str(mix_path),
+                "audio_len": audio_len,
             }
 
             s1_audio = s1_dir / mix_name
