@@ -16,8 +16,7 @@ This repository contains several architectures and training configs for the task
 - **Conv-TasNet–like model** — convolutional TCN-based separator in the time domain;
 - **AVRTFSNet (audio-visual RTFS)** — recurrent time–frequency model that additionally uses visual embeddings (mouth crops).
 
-> Report on the completed work: **link**  
-> Best checkpoints: **link**
+Best checkpoints can be found in a DEMO.ipynb 
 
 
 ## Installation
