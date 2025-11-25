@@ -10,9 +10,15 @@
 
 ## About
 
-This repository contains a template for solving ASR task with PyTorch. This template branch is a part of the [HSE DLA course](https://github.com/markovka17/dla) ASR homework. Some parts of the code are missing (or do not follow the most optimal design choices...) and students are required to fill these parts themselves (as well as writing their own models, etc.).
+This repository contains several architectures and training configs for the task of **speech separation** in the time domain:
 
-See the task assignment [here](https://github.com/markovka17/dla/tree/2024/hw1_asr).
+- **DPRNN** — dual-path recurrent network for long-context modeling;
+- **Conv-TasNet–like model** — convolutional TCN-based separator in the time domain;
+- **AVRTFSNet (audio-visual RTFS)** — recurrent time–frequency model that additionally uses visual embeddings (mouth crops).
+
+> Report on the completed work: **link**  
+> Best checkpoints: **link**
+
 
 ## Installation
 
@@ -54,7 +60,36 @@ Follow these steps to install the project:
    pre-commit install
    ```
 
+The code is designed to work with the DLA AVSS dataset in the following directory structure:
+dla_dataset
+├── audio
+│   ├── mix
+│   │   ├── <id>.wav
+│   │   └── ...
+│   ├── s1
+│   │   ├── <id>.wav
+│   │   └── ...
+│   └── s2
+│       ├── <id>.wav
+│       └── ...
+└── mouths
+    ├── <speaker_id>.npz      # mouth crops or embeddings (for AV models)
+    └── ...
+
+
+In Hydra configs this path is typically referenced as:
+  ```
+datasets:
+  train:
+    data_dir: "PATH_TO/dla_dataset"
+  val:
+    data_dir: "PATH_TO/dla_dataset"
+  ```
 ## How To Use
+All training and evaluation scripts are built on top of Hydra.
+Main entry points:
+train.py — training loop (with validation and checkpointing)
+inference.py — running inference / computing metrics for saved predictions 
 
 To train a model, run the following command:
 
@@ -68,6 +103,14 @@ To run inference (evaluate the model or save predictions):
 
 ```bash
 python3 inference.py HYDRA_CONFIG_ARGUMENTS
+```
+DPRNN Baseline:
+```
+python3 train.py -cn=baseline_dprnn \
+  datasets.train.data_dir=/path/to/dla_dataset \
+  datasets.val.data_dir=/path/to/dla_dataset \
+  dataloader.batch_size=8 \
+  trainer.n_epochs=100
 ```
 
 ## Credits
