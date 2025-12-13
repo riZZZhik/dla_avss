@@ -90,21 +90,21 @@ def calc_metrics():
         metrics["SI-SNR"].append(
             (
                 calc_si_snr(predicted_s1, groundtruth_s1)
-                + calc_si_snr(predicted_s1, groundtruth_s1)
+                + calc_si_snr(predicted_s2, groundtruth_s2)
             )
             / 2
         )
         metrics["PESQ"].append(
             (
                 calc_pesq(predicted_s1, groundtruth_s1)
-                + calc_pesq(predicted_s1, groundtruth_s1)
+                + calc_pesq(predicted_s2, groundtruth_s2)
             )
             / 2
         )
         metrics["STOI"].append(
             (
                 calc_stoi(predicted_s1, groundtruth_s1)
-                + calc_stoi(predicted_s1, groundtruth_s1)
+                + calc_stoi(predicted_s2, groundtruth_s2)
             )
             / 2
         )
@@ -117,7 +117,7 @@ def calc_metrics():
                 (
                     calc_si_snr(predicted_s1, groundtruth_s1)
                     - calc_si_snr(mix_audio, groundtruth_s1)
-                    + calc_si_snr(predicted_s1, groundtruth_s1)
+                    + calc_si_snr(predicted_s2, groundtruth_s2)
                     - calc_si_snr(mix_audio, groundtruth_s2)
                 )
                 / 2
@@ -126,7 +126,7 @@ def calc_metrics():
                 (
                     calc_sdr(predicted_s1, groundtruth_s1)
                     - calc_sdr(mix_audio, groundtruth_s1)
-                    + calc_sdr(predicted_s1, groundtruth_s1)
+                    + calc_sdr(predicted_s2, groundtruth_s2)
                     - calc_sdr(mix_audio, groundtruth_s2)
                 )
                 / 2
