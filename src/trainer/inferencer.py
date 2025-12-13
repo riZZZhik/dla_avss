@@ -162,14 +162,21 @@ class Inferencer(BaseTrainer):
                 save_path_s2 = self.save_path / part / "s2"
                 os.makedirs(save_path_s1, exist_ok=True)
                 os.makedirs(save_path_s2, exist_ok=True)
+
+                true_predicted_s1 = true_predicted_s1.cpu().unsqueeze(0)
+                true_predicted_s2 = true_predicted_s2.cpu().unsqueeze(0)
+
+                true_predicted_s1 /= torch.max(torch.abs(true_predicted_s1))
+                true_predicted_s2 /= torch.max(torch.abs(true_predicted_s2))
+
                 torchaudio.save(
                     uri=save_path_s1 / audio_filename,
-                    src=true_predicted_s1.cpu().unsqueeze(0),
+                    src=true_predicted_s1,
                     sample_rate=sample_rate,
                 )
                 torchaudio.save(
                     uri=save_path_s2 / audio_filename,
-                    src=true_predicted_s2.cpu().unsqueeze(0),
+                    src=true_predicted_s2,
                     sample_rate=sample_rate,
                 )
 
