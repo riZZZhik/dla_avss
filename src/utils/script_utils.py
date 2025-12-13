@@ -122,7 +122,7 @@ def calc_metrics():
                 )
                 / 2
             )
-            metrics["SI-SNRi"].append(
+            metrics["SDRi"].append(
                 (
                     calc_sdr(predicted_s1, groundtruth_s1)
                     - calc_sdr(mix_audio, groundtruth_s1)
